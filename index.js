@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config()
 const app = express();
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId} = require("mongodb");
 const port = process.env.PORT || 5000;
 
 console.log(process.env.DB_PASS)
@@ -44,10 +44,47 @@ async function run() {
         res.send(result)
     })
 
+    // book collection
+
     app.post('/books', async(req, res) => {
         const newBook = req.body;
         console.log(newBook)
         const result = await bookCollection.insertOne(newBook)
+        res.send(result)
+    })
+
+    app.get('/books', async(req, res) => {
+        const cursor = bookCollection.find();
+        const result = await cursor.toArray();
+        res.send(result);
+    })
+
+    
+    app.get("/books/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await bookCollection.findOne(query);
+      res.send(result);
+    });
+
+    app.put('/books/:id', async(req, res) => {
+        const id = req.params.id;
+        const filter = { _id: new ObjectId(id) };
+        const options = { upsert: true };
+        const updatedBooks = req.body;
+        const books = {
+            $set: {
+                name: updatedBooks.name,
+                authorName: updatedBooks.authorName,
+                image: updatedBooks.image,
+                bookCategory: updatedBooks.bookCategory,
+                quantity: updatedBooks.quantity,
+                description: updatedBooks.description,
+                rating: updatedBooks.rating,
+
+            }
+        }
+        const result = await bookCollection.updateOne(filter, books, options);
         res.send(result)
     })
 
