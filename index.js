@@ -34,8 +34,27 @@ async function run() {
 
 
     const categoryCollection = client.db('libraryManagement').collection('category');
-    const bookCollection = client.db('libraryManagement').collection('book')
+    const bookCollection = client.db('libraryManagement').collection('book');
+    const borrowCollection = client.db('libraryManagement').collection('borrow')
 
+
+    app.get('/borrow', async(req, res) => {
+        let query = {};
+        if(req.query?.email){
+          query = {email: req.query.email}
+        }
+      const result = await borrowCollection.find(query).toArray();
+    
+
+      res.send(result)
+    })
+
+    app.post('/borrow', async(req, res) => {
+      const borrows = req.body;
+      console.log(borrows);
+      const result = await borrowCollection.insertOne(borrows);
+      res.send(result)
+    })
 
     // category collection
     app.get('/category', async(req, res) => {
