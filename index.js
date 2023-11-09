@@ -61,6 +61,14 @@ async function run() {
       res.send(result)
     })
 
+    app.delete('/borrow/:id', async(req, res) => {
+      const id = req.params.id;
+      const query = {_id: new ObjectId(id)}
+      const result = await borrowCollection.deleteOne(query)
+      res.send(result)
+    })
+
+
     // category collection
     app.get('/category', async(req, res) => {
         const cursor = categoryCollection.find();
